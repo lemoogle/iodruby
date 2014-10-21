@@ -1,10 +1,8 @@
 require "iodruby/version"
 
 
-require 'active_model'
 require 'Unirest'
-require 'active_support'
-require 'httpclient'
+#require 'httpclient'
 
 
 
