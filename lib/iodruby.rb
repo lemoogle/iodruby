@@ -6,7 +6,6 @@ require 'Unirest'
 
 
 
-module Iodruby
 
 
 
@@ -219,9 +218,6 @@ class IODDoc
       return render :json => JSON::dump(@data)
   end
 
-
-
-end
 
 
 end
