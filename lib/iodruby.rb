@@ -1,7 +1,7 @@
-require "iodruby/version"
 
 
 require 'Unirest'
+require 'json'
 #require 'httpclient'
 
 
@@ -12,6 +12,47 @@ require 'Unirest'
 class IODError < StandardError
 
 end
+
+
+
+class IODResponse
+
+  attr_accessor :response
+
+  def initialize(response)
+    #@query=query
+
+    @response=response
+  end
+
+  def json()
+    @response.body
+  end
+
+end
+
+class IODAsyncResponse < IODResponse
+
+  attr_accessor :response
+  attr_accessor :jobID
+  def initialize(response,client)
+    #@query=query
+    @response=response
+    @client=client
+    @jobID =response.body["jobID"]
+  end
+
+  def status()
+    @client.getStatus(@jobID)
+  end
+
+  def result()
+    @client.getResult(@jobID)
+  end
+
+end
+
+
 
 class IODClient
   @@version=1
@@ -25,9 +66,24 @@ class IODClient
   end
 
 
+  def getStatus(jobID)
+    data={"apikey"=>@apikey}
+    response=Unirest.post "#{@url}/#{@@version}/job/status/#{jobID}",
+                    headers:{ "Accept" => "application/json" },
+                    parameters:data
+    return IODResponse.new(response)
+
+  end
+
+  def getResult(jobID)
+    data={"apikey"=>@apikey}
+    response=Unirest.post "#{@url}/#{@@version}/job/result/#{jobID}",
+                      headers:{ "Accept" => "application/json" },
+                      parameters:data
+    return IODResponse.new(response)
+  end
 
   def deleteIndex(index)
-    puts index.class.name
     if index.class.name=="IODIndex"
       index=index.name
     end
@@ -36,54 +92,71 @@ class IODClient
     data[:index]=index
 
     delete=post("deletetextindex",data)
-  confirm=delete["confirm"]
-  data[:confirm]=confirm
-  delete=post("deletetextindex",data)
+    confirm=delete.json()["confirm"]
+    data[:confirm]=confirm
+    delete=post("deletetextindex",data)
+    return delete
+  end
 
+  def deleteConnector(connector)
+    data=connectorUtil(connector)
+    delete=post("deleteconnector",data)
+    return delete
   end
 
 
-  def post(handler, data=Hash.new)
-    data[:apikey]=@apikey
-    data[:fake]=File.new("new.rb", 'rb')
+  def connectorUtil(connector)
+    if index.class.name=="IODConnector"
+      connector=connector.name
+    end
+    data=Hash.new
+    data[:connector]=connector
+    return data
+  end
 
-    response=Unirest.post "#{@url}/#{@@version}/api/sync/#{handler}/v#{@@apidefault}",
+
+  def startConnector(connector)
+    data=connectorUtil(connector)
+    return post("startconnector",data)
+  end
+
+  def retrieveConnectorConfig(connector)
+    data=connectorUtil(connector)
+    return post("retrieveconfig",data)
+  end
+
+  def connectorstatus(connector)
+    data=connectorUtil(connector)
+    return post("connectorstatus",data)
+  end
+
+  def post(handler, data=Hash.new, async=false)
+    data[:apikey]=@apikey
+    syncpath="sync"
+    if async
+      syncpath="async"
+    end
+    Unirest.timeout(30)
+    response=Unirest.post "#{@url}/#{@@version}/api/#{syncpath}/#{handler}/v#{@@apidefault}",
                         headers:{ "Accept" => "application/json" },
                         parameters:data
+    if response.code == 200
 
-=begin
-  clnt = HTTPClient.new
-  response= clnt.post('#{@url}/#{@@version}/api/sync/#{handler}/v#{@@apidefault}', data)
-  puts "MARTIN"
-  puts response
-=end
-     if response.code == 200
-      return response.body
+      if async
+        return IODAsyncResponse.new(response,self)
+      end
+      return IODResponse.new(response)
     else
-      puts data[:json].encoding.name
-    File.open('text.txt', 'w') { |file| file.write(data[:json]) }
       puts response.body
+      #puts data[:json].encoding.name
       raise IODError.new "Error #{response.body["error"]} -- #{response.body["reason"]}"
     end
   end
 
-
-  def postasync(handler, data=Hash.new)
-    data[:apikey]=@apikey
-    response=Unirest.post "#{@url}/#{@@version}/api/async/#{handler}/v#{@@apidefault}",
-                        headers:{ "Accept" => "application/json" },
-                        parameters:data
-
-     if response.code == 200
-      return response.body
-    else
-      raise IODError.new "Error #{response.body["error"]} -- #{response.body["reason"]}"
-    end
-  end
 
 
   def getIndex(name)
-    indexes=this.listIndexes()
+    #indexes=self.listIndexes()
 
     index=IODIndex.new(name,client:self)
     #puts (index in indexes)
@@ -92,11 +165,12 @@ class IODClient
 
 
 
-  def createIndex(name)
+  def createIndex(name,flavor="standard",parametric_fields=[],index_fields=[])
     data=Hash.new
     data[:index]=name
-    data[:flavor]="standard"
-    data[:type]="normal"
+    data[:flavor]=flavor
+    data[:parametric_fields]=parametric_fields
+    data[:index_fields]=index_fields
     self.post("createtextindex",data)
     return IODIndex.new(name,client:self)
   end
@@ -113,21 +187,87 @@ class IODClient
       self.addDocs([doc],index)
   end
 
-  def addDocs(docs, index)
-      puts docs
-      puts docs.length
-      jsondocs= docs.map { |doc| doc.data}
+  def addDocs(docs, index,async=false)
+
+
+    #  puts docs
+    #  puts docs.length
+    #jsondocs= docs.map { |doc| doc.data}
+    jsondocs=docs
+    #puts jsondocs
     docs=Hash.new
     docs[:documents]=jsondocs
+
     #puts docs.to_json
     docs=docs.to_json
+    puts docs.length
+    #puts docs
     #docs=render :json => JSON::dump(docs)
     data={json:docs,index:index}
 
-    return self.post("addtotextindex",data)
+    return self.post("addtotextindex",data,async)
   end
 
 end
+
+class IODConnector
+
+    attr_reader :client
+    attr_reader :name
+
+
+  def initialize(name,client=nil)
+    @name=name
+    @client=client
+  end
+
+  def create(type="web",config=Hash.new, destination="", schedule="",description="")
+    config("addtotextindex",type,config,destination,schedule,description)
+  end
+
+
+  def update(type="web",config=Hash.new, destination="", schedule="",description="")
+    config("addtotextindex",type,config,destination,schedule,description)
+  end
+
+  def config(method,type="",config="", destination="", schedule="",description="")
+    data=Hash.new
+    data[:connector]=@name
+    if type!=""
+      data[:type]=type
+    end
+    if config!=""
+      data[:config]=JSON.dump config
+    end
+    if destination!=""
+      destination={"action"=>"addtotextindex", "index" => destination }
+      data[:destination]=JSON.dump destination
+    end
+    if schedule != ""
+      data[:schedule]=JSON.dump schedule
+    end
+    data[:description]=description
+    result=@client.post(method,data)
+    puts result
+  end
+
+  def delete()
+    @client.deleteConnector(@name)
+  end
+
+  def config()
+    @client.retrieveConnectorConfig(@name)
+  end
+
+  def status()
+    @client.connectorStatus(@name)
+  end
+
+  def ==(other_object)
+    comparison_object.equal?(self) || (comparison_object.instance_of?(self.class) && @name == other_object.name)
+  end
+end
+
 
 
 
@@ -161,15 +301,16 @@ class IODIndex
 
   end
 
-  def commit()
+  def commit(async=false)
 #		docs={document:@docs}
 #		data={json:docs.to_json,index:@name}
 #		puts docs.to_json
 
     #r=@client.post("addtotextindex",data)
     #@docs=[]
-    addDocs(@docs)
+    response=addDocs(@docs,async)
     @docs=[]
+    return response
   end
 
   def addDoc(doc)
@@ -182,13 +323,13 @@ class IODIndex
   end
 
 
-  def addDocs(docs)
+  def addDocs(docs,async=false)
 
 #		docs[:document]=[doc.data]
 #		data={json:docs.to_json,index:@name}
 #		@client.postasync("addtotextindex",data)
 
-    puts @client.addDocs(docs,@name)
+    return @client.addDocs(docs,@name,async)
   end
 
   def delete()
