@@ -55,7 +55,13 @@ def test_createConnector
   puts conn.delete()
 end
 
+def test_sentiment
 
-test_createConnector()
+  client= IODClient.new("http://api.idolondemand.com",$apikey)
+  r=client.post('analyzesentiment',{'text'=>'I like cats'})
+  puts r.json()
+end
+
+test_sentiment()
 
 #test_createIndex()

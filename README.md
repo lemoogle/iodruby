@@ -1,6 +1,8 @@
 # Iodruby
 
-TODO: Write a gem description
+Ruby Gem to help call IDOL OnDemand API.
+ [http://idolondemand.com](http://idolondemand.com)
+
 
 ## Installation
 
@@ -80,7 +82,7 @@ index = client.getIndex('myindex')
 ```
 The getIndex call will return an iodindex Index object but will not check for existence.
 
-```ruby 
+```ruby
 indexes = client.listIndexes()
 indexes.fetch('myindex',client.createIndex('myindex'))
 ```
@@ -118,7 +120,7 @@ index.commit()
 
 An alternative to *addDocs* and easy way to keep batch documents is to use the pushDoc method, the index will keep in memory a list of the documents it needs to index.
 
-``` 
+```
 if index.countDocs()>10:
   index.commit()
 ```
@@ -159,7 +161,7 @@ r=index.commit(async=True)
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/iodruby/fork )
+1. Fork it ( https://github.com/lemoogle/iodruby/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
