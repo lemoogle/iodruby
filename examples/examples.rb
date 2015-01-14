@@ -1,6 +1,6 @@
 require_relative "../lib/iodruby.rb"
 
-$apikey="1642237f-8d30-4263-b2f9-12efab36c779"
+$apikey="yourapikey"
 
 
 
