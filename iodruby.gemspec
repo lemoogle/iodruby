@@ -6,7 +6,7 @@ require 'iodruby/version'
 Gem::Specification.new do |spec|
   spec.name          = "iodruby"
   spec.version       = Iodruby::VERSION
-  spec.authors       = ["Tyler Nappy, Martin Zerbib"]
+  spec.authors       = ["Tyler Nappy" ," Martin Zerbib"]
   spec.email         = ["tyler.nappy@hpe.com" ,"martin.zerbib@hp.com"]
   spec.summary       = %q{Idol OnDemand Ruby Client}
   spec.description   = %q{}
