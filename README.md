@@ -151,7 +151,7 @@ conn.delete()
 For each call the Async parameter can be set to true to send an asynchronous request.
 
 ```ruby
-r = client.post('analyzesentiment', {:text => 'I like cats'}, async = True)
+r = client.post('analyzesentiment', {:text => 'I like cats'}, async = true)
 print r.json()
 
 # will return status of call, queued or finished
@@ -163,7 +163,7 @@ puts r.result().json()
 Same thing for indexing.
 
 ```ruby
-r = index.commit(async = True)
+r = index.commit(async = true)
 ```
 
 
