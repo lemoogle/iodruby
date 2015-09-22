@@ -6,11 +6,17 @@ Ruby Gem to help call IDOL OnDemand API.
 
 ## Installation
 
-To install from this git repo use the specific_install gem.
+To install from rubygems.org.
+
+```
+gem install iodruby
+```
+
+To install the latest version from this github repo, use the specific_install gem.
 
 ```
 gem install specific_install
-gem specific_install http://github.com/lemoogle/iodruby
+gem specific_install https://github.com/HP-IDOL-OnDemand/iodruby
 ```
 
 
@@ -18,15 +24,19 @@ gem specific_install http://github.com/lemoogle/iodruby
 
 
 ### Importing
-
+When using rails and other frameworks with a gem file, include it in it.
+```ruby
+gem "iodruby"
 ```
+Or, require it directly in your app.
+```ruby
 require "iodruby"
 ```
 
 ###Initializing the client
 
-```
-client= IODClient.new("http://api.idolondemand.com",$apikey)
+```ruby
+client = IODClient.new("http://api.idolondemand.com", $apikey)
 ```
 
 All that is needed to initialize the client is an apikey and the url of the API.
@@ -35,33 +45,32 @@ All that is needed to initialize the client is an apikey and the url of the API.
 ###Sending requests
 
 ```ruby
-r=client.post('analyzesentiment',{:text=>'I like cats'})
+r = client.post('analyzesentiment', {:text=>'I like cats'})
 ```
 The client's *post* method takes the apipath that you're sending your request to as well as an object containing the parameters you want to send to the api. You do not need to send your apikey each time as the client will handle that automatically
 
 ###Posting files
-
 ```ruby
-r=client.post('ocrdocument',{:file=>File.new("/path/to/file", 'rb')})
+r = client.post('ocrdocument', {:file=>File.new("/path/to/file", 'rb')})
 ```
 Sending files is just as easy.
 
 ```ruby
-r=client.post('ocrdocument',{:mode=>'photo',:file=>File.new("/path/to/file", 'rb')})
-r=client.post('ocrdocument',{:mode=>'photo',:file=>File.new("/path/to/file", 'rb')})
+r = client.post('ocrdocument', {:mode=>'photo',:file=>File.new("/path/to/file", 'rb')})
+r = client.post('ocrdocument', {:mode=>'photo',:file=>File.new("/path/to/file", 'rb')})
 ```
 Any extra parameters should be added in the same way as regular calls, or in the data parameter.
 
 ###Parsing the output
 
 ```ruby
-myjson=r.json()
+myjson = r.json()
 ```
 
 The object returned is a response object from the python [requests library](http://docs.python-requests.org/en/latest/) and can easily be turned to json.
 
 ```ruby
-docs=myjson["documents"]
+docs = myjson["documents"]
 array.each {|doc| puts doc["title"] }
 ```
 
@@ -70,7 +79,7 @@ array.each {|doc| puts doc["title"] }
 **Creating an index**
 
 ```ruby
-index=client.createIndex("mytestindex",flavor="explorer")
+index = client.createIndex("mytestindex", flavor="explorer")
 ```
 
 An Index object can easily be created
@@ -84,7 +93,7 @@ The getIndex call will return an iodindex Index object but will not check for ex
 
 ```ruby
 indexes = client.listIndexes()
-indexes.fetch('myindex',client.createIndex('myindex'))
+indexes.fetch('myindex', client.createIndex('myindex'))
 ```
 
 Here we first check the list of our indexes and return a newly created index if the index does not already exist
@@ -100,8 +109,8 @@ An index can be deleted in two equivalent ways
 **Indexing documents**
 
 ```ruby
-doc1=IODDoc.new({title:"title1",reference:"doc1",content:"my content 1"})
-doc2=IODDoc.new({title:"title2",reference:"doc2",content:"my content 2"})
+doc1 = IODDoc.new({title: "title1", reference: "doc1", content: "my content 1"})
+doc2 = IODDoc.new({title: "title2", reference: "doc2", content: "my content 2"})
 ```
 Documents can be created as regular python objects
 
@@ -130,9 +139,9 @@ It makes it easy to batch together groups of documents.
 ####Indexing - Connectors
 
 ```ruby
-client= IODClient.new("http://api.idolondemand.com",$apikey)
-conn=IODConnector.new("mytestconnector",client)
-conn.create(type="web",config={ "url" => "http://www.idolondemand.com" })
+client = IODClient.new("http://api.idolondemand.com", $apikey)
+conn = IODConnector.new("mytestconnector", client)
+conn.create(type="web", config = { "url" => "http://www.idolondemand.com" })
 conn.delete()
 ```
 
@@ -142,7 +151,7 @@ conn.delete()
 For each call the Async parameter can be set to true to send an asynchronous request.
 
 ```ruby
-r=client.post('analyzesentiment',{:text=>'I like cats'},async=True)
+r = client.post('analyzesentiment', {:text => 'I like cats'}, async = True)
 print r.json()
 
 # will return status of call, queued or finished
@@ -154,14 +163,14 @@ puts r.result().json()
 Same thing for indexing.
 
 ```ruby
-r=index.commit(async=True)
+r = index.commit(async = True)
 ```
 
 
 
 ## Contributing
 
-1. Fork it ( https://github.com/lemoogle/iodruby/fork )
+1. Fork it ( https://github.com/HP-IDOL-OnDemand/iodruby/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
