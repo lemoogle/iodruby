@@ -1,4 +1,4 @@
-# Iodruby
+# iodruby
 
 Ruby Gem to help call IDOL OnDemand API.
  [http://idolondemand.com](http://idolondemand.com)
