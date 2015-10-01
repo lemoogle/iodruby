@@ -138,8 +138,8 @@ class IODClient
     end
     Unirest.timeout(30)
     response=Unirest.post "#{@url}/#{@@version}/api/#{syncpath}/#{handler}/v#{@@apidefault}",
-                        headers:{ "Accept" => "application/json" },
-                        parameters:data
+                        headers:{ "Accept" => "application/json", "Content-Type" => "application/json"},
+                        parameters:data.to_json
     if response.code == 200
 
       if async
