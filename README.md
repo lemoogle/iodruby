@@ -1,5 +1,7 @@
+**Note:** use `iod` branch for older compatibility syntax.  
+
 # Ruby gem for Haven OnDemand
-Official client library to help with calling Haven OnDemand APIs [http://havenondemand.com](http://havenondemand.com).
+Official Ruby gem to help with calling Haven OnDemand APIs [http://havenondemand.com](http://havenondemand.com). Gem is hosted on rubygems.org [here](https://rubygems.org/gems/havenondemand).
 
 ## What is Haven OnDemand?
 Haven OnDemand is a set of over 70 APIs for handling all sorts of unstructured data. Here are just some of our APIs' capabilities:
