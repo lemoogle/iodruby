@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'iodruby/version'
+require 'havenondemand/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "iodruby"
-  spec.version       = Iodruby::VERSION
+  spec.name          = "havenondemand"
+  spec.version       = Havenondemand::VERSION
   spec.authors       = ["Tyler Nappy" ," Martin Zerbib"]
-  spec.email         = ["tyler.nappy@hpe.com" ,"martin.zerbib@hp.com"]
-  spec.summary       = %q{Idol OnDemand Ruby Client}
+  spec.email         = ["tyler.nappy@hpe.com"]
+  spec.summary       = %q{Haven OnDemand Ruby Client}
   spec.description   = %q{}
-  spec.homepage      = "https://github.com/HP-IDOL-OnDemand/iodruby"
+  spec.homepage      = "https://github.com/HP-Haven-OnDemand/havenondemand-ruby"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")

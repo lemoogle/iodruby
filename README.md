@@ -22,14 +22,14 @@ For a full list of all the APIs and to try them out, check out https://www.haven
 To install from rubygems.org.
 
 ```
-gem install iodruby
+gem install havenondemand
 ```
 
 To install the latest version from this github repo, use the specific_install gem.
 
 ```
 gem install specific_install
-gem specific_install https://github.com/HP-IDOL-OnDemand/iodruby
+gem specific_install https://github.com/HP-Haven-OnDemand/havenondemand-ruby
 ```
 
 
@@ -39,17 +39,17 @@ gem specific_install https://github.com/HP-IDOL-OnDemand/iodruby
 ### Importing
 When using rails and other frameworks with a gem file, include it in it.
 ```ruby
-gem "iodruby"
+gem "havenondemand"
 ```
 Or, require it directly in your app.
 ```ruby
-require "iodruby"
+require "havenondemand"
 ```
 
 ###Initializing the client
-
+*Note*: URL endpoint will change in the near future to
 ```ruby
-client = IODClient.new("http://api.idolondemand.com", $apikey)
+client = HODClient.new("http://api.idolondemand.com", $apikey)
 ```
 
 All that is needed to initialize the client is an apikey and the url of the API.
@@ -102,7 +102,7 @@ An Index object can easily be created
 ```ruby
 index = client.getIndex('myindex')
 ```
-The getIndex call will return an iodindex Index object but will not check for existence.
+The getIndex call will return an hodindex Index object but will not check for existence.
 
 ```ruby
 indexes = client.listIndexes()
@@ -122,8 +122,8 @@ An index can be deleted in two equivalent ways
 **Indexing documents**
 
 ```ruby
-doc1 = IODDoc.new({title: "title1", reference: "doc1", content: "my content 1"})
-doc2 = IODDoc.new({title: "title2", reference: "doc2", content: "my content 2"})
+doc1 = HODDoc.new({title: "title1", reference: "doc1", content: "my content 1"})
+doc2 = HODDoc.new({title: "title2", reference: "doc2", content: "my content 2"})
 ```
 Documents can be created as regular python objects
 
@@ -152,8 +152,8 @@ It makes it easy to batch together groups of documents.
 ####Indexing - Connectors
 
 ```ruby
-client = IODClient.new("http://api.idolondemand.com", $apikey)
-conn = IODConnector.new("mytestconnector", client)
+client = HODClient.new("http://api.idolondemand.com", $apikey)
+conn = HODConnector.new("mytestconnector", client)
 conn.create(type="web", config = { "url" => "http://www.idolondemand.com" })
 conn.delete()
 ```
@@ -183,7 +183,7 @@ r = index.commit(async = true)
 
 ## Contributing
 
-1. Fork it ( https://github.com/HP-IDOL-OnDemand/iodruby/fork )
+1. Fork it ( https://github.com/HP-Haven-OnDemand/havenondemand-ruby/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

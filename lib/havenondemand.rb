@@ -9,13 +9,13 @@ require 'json'
 
 
 
-class IODError < StandardError
+class HODError < StandardError
 
 end
 
 
 
-class IODResponse
+class HODResponse
 
   attr_accessor :response
 
@@ -31,7 +31,7 @@ class IODResponse
 
 end
 
-class IODAsyncResponse < IODResponse
+class HODAsyncResponse < HODResponse
 
   attr_accessor :response
   attr_accessor :jobID
@@ -54,7 +54,7 @@ end
 
 
 
-class IODClient
+class HODClient
   @@version=1
   @@apidefault=1
   def initialize(url, apikey)
@@ -71,7 +71,7 @@ class IODClient
     response=Unirest.post "#{@url}/#{@@version}/job/status/#{jobID}",
                     headers:{ "Accept" => "application/json" },
                     parameters:data
-    return IODResponse.new(response)
+    return HODResponse.new(response)
 
   end
 
@@ -80,11 +80,11 @@ class IODClient
     response=Unirest.post "#{@url}/#{@@version}/job/result/#{jobID}",
                       headers:{ "Accept" => "application/json" },
                       parameters:data
-    return IODResponse.new(response)
+    return HODResponse.new(response)
   end
 
   def deleteIndex(index)
-    if index.class.name=="IODIndex"
+    if index.class.name=="HODIndex"
       index=index.name
     end
 
@@ -106,7 +106,7 @@ class IODClient
 
 
   def connectorUtil(connector)
-    if index.class.name=="IODConnector"
+    if index.class.name=="HODConnector"
       connector=connector.name
     end
     data=Hash.new
@@ -143,13 +143,13 @@ class IODClient
     if response.code == 200
 
       if async
-        return IODAsyncResponse.new(response,self)
+        return HODAsyncResponse.new(response,self)
       end
-      return IODResponse.new(response)
+      return HODResponse.new(response)
     else
       puts response.body
       #puts data[:json].encoding.name
-      raise IODError.new "Error #{response.body["error"]} -- #{response.body["reason"]}"
+      raise HODError.new "Error #{response.body["error"]} -- #{response.body["reason"]}"
     end
   end
 
@@ -158,7 +158,7 @@ class IODClient
   def getIndex(name)
     #indexes=self.listIndexes()
 
-    index=IODIndex.new(name,client:self)
+    index=HODIndex.new(name,client:self)
     #puts (index in indexes)
 
   end
@@ -172,13 +172,13 @@ class IODClient
     data[:parametric_fields]=parametric_fields
     data[:index_fields]=index_fields
     self.post("createtextindex",data)
-    return IODIndex.new(name,client:self)
+    return HODIndex.new(name,client:self)
   end
 
   def listIndexes()
     r=post("listindex")
 
-    indexes=r["index"].map { |index| IODIndex.new(index["index"],index["flavor"],index["type"],client:self)}
+    indexes=r["index"].map { |index| HODIndex.new(index["index"],index["flavor"],index["type"],client:self)}
 
   end
 
@@ -210,7 +210,7 @@ class IODClient
 
 end
 
-class IODConnector
+class HODConnector
 
     attr_reader :client
     attr_reader :name
@@ -272,7 +272,7 @@ end
 
 
 
-class IODIndex
+class HODIndex
 
     attr_reader :client
     attr_reader :name
@@ -290,7 +290,7 @@ class IODIndex
 
       data[:text]=text
     result=@client.post("querytextindex",data)
-    result["documents"].map!{|doc| IODDoc.new(doc) }
+    result["documents"].map!{|doc| HODDoc.new(doc) }
       return result
     end
    def size()
@@ -344,7 +344,7 @@ end
 
 
 
-class IODDoc
+class HODDoc
 
     attr_accessor :data
     attr_accessor :sentiment

@@ -1,2 +1,2 @@
-require_relative "../lib/iodruby"
+require_relative "../lib/havenondemand"
 require "test/unit"
