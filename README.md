@@ -1,7 +1,20 @@
-# iodruby
+# Ruby gem for Haven OnDemand
+Official client library to help with calling Haven OnDemand APIs [http://havenondemand.com](http://havenondemand.com).
 
-Ruby Gem to help call IDOL OnDemand API.
- [http://idolondemand.com](http://idolondemand.com)
+## What is Haven OnDemand?
+Haven OnDemand is a set of over 70 APIs for handling all sorts of unstructured data. Here are just some of our APIs' capabilities:
+* Speech to text
+* OCR
+* Text extraction
+* Indexing documents
+* Smart search
+* Language identification
+* Concept extraction
+* Sentiment analysis
+* Web crawlers
+* Machine learning
+
+For a full list of all the APIs and to try them out, check out https://www.havenondemand.com/developer/apis
 
 
 ## Installation
