@@ -51,7 +51,7 @@ require "havenondemand"
 ###Initializing the client
 *Note*: URL endpoint will change in the near future to
 ```ruby
-client = HODClient.new("http://api.idolondemand.com", $apikey)
+client = HODClient.new("http://api.havenondemand.com", $apikey)
 ```
 
 All that is needed to initialize the client is an apikey and the url of the API.
