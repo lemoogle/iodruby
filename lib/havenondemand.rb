@@ -56,11 +56,14 @@ end
 
 class HODClient
   @@version=1
-  @@apidefault=1
-  def initialize(url, apikey)
+  @@apidefault="v1"
+  def initialize(apikey, version="v1")
     # Instance variables
-
-    @url = url
+    if apikey=='http://api.havenondemand.com' || apikey=='http://api.havenondemand.com/' || apikey=='https://api.havenondemand.com' || apikey=='https://api.havenondemand.com/'
+      raise ArgumentError, "Using an outdated wrapper constructor method. No need to include API URL.\nInclude as such:\n client = HODClient(API_KEY, VERSION)\n where version is optional"
+    end
+    @@apidefault=version
+    @url = "https://api.havenondemand.com"
     @apikey = apikey
 
   end
@@ -137,9 +140,9 @@ class HODClient
       syncpath="async"
     end
     Unirest.timeout(30)
-    response=Unirest.post "#{@url}/#{@@version}/api/#{syncpath}/#{handler}/v#{@@apidefault}",
+    response=Unirest.post "#{@url}/#{@@version}/api/#{syncpath}/#{handler}/#{@@apidefault}",
                         headers:{ "Accept" => "application/json", "Content-Type" => "application/json"},
-                        parameters:data.to_json
+                        parameters:data
     if response.code == 200
 
       if async

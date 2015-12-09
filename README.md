@@ -49,13 +49,12 @@ require "havenondemand"
 ```
 
 ###Initializing the client
-*Note*: URL endpoint will change in the near future to
 ```ruby
-client = HODClient.new("http://api.havenondemand.com", $apikey)
+client = HODClient.new(apikey, version)
 ```
+You can find your API key [here](https://www.haveondemand.com/account/api-keys.html) after signing up.
 
-All that is needed to initialize the client is an apikey and the url of the API.
-
+`version` is an optional parameter (defaults to `'v1'`) and can be either `'v1'` or `'v2'`.
 
 ###Sending requests
 
