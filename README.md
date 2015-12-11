@@ -153,9 +153,9 @@ It makes it easy to batch together groups of documents.
 ####Indexing - Connectors
 
 ```ruby
-client = HODClient.new("http://api.idolondemand.com", $apikey)
+client = HODClient.new(apikey, version)
 conn = HODConnector.new("mytestconnector", client)
-conn.create(type="web", config = { "url" => "http://www.idolondemand.com" })
+conn.create(type="web", config = { "url" => "http://www.havenondemand.com" })
 conn.delete()
 ```
 
