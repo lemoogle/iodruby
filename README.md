@@ -183,8 +183,9 @@ r = index.commit(async = true)
 
 
 ## Contributing
+We encourage you to contribute to this repo! Please send pull requests with modified and updated code.
 
-1. Fork it ( https://github.com/HP-Haven-OnDemand/havenondemand-ruby/fork )
+1. Fork it ( https://github.com/HPE-Haven-OnDemand/havenondemand-ruby/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
