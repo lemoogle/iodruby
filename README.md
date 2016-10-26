@@ -88,6 +88,20 @@ docs = myjson["documents"]
 array.each {|doc| puts doc["title"] }
 ```
 
+### Combinations
+
+Haven OnDemand allows to chain two ore more APIs together to create customizable, reusable services. These combinations enable one data input to have unlimited transformations and processing all from a single API call.
+
+```ruby
+data =  { :parameters => { :name => "name_of_input", :value => "value_of_input"} }
+r = client.post_combination('name_of_combination', data)
+puts r.json()
+```
+
+**Note: using local files and publicly accessible URLs is not supported by this wrapper**
+
+To find out more about combinations and how to create one, see [here](https://dev.havenondemand.com/combination/home).
+
 ###Indexing
 
 **Creating an index**

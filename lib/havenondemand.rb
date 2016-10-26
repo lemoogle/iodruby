@@ -3,6 +3,7 @@
 require 'Unirest'
 require 'json'
 #require 'httpclient'
+require 'byebug'
 
 
 
@@ -131,6 +132,32 @@ class HODClient
   def connectorstatus(connector)
     data=connectorUtil(connector)
     return post("connectorstatus",data)
+  end
+
+  def post_combination(combination, data=Hash.new, async=false)
+    handler="executecombination"
+    data[:apikey]=@apikey
+    syncpath="sync"
+    syncpath="async" if async
+    data[:combination] = combination
+    data[:parameters] = data[:parameters].to_json
+    Unirest.timeout(30)
+
+    response=Unirest.post "#{@url}/#{@@version}/api/#{syncpath}/#{handler}/#{@@apidefault}",
+                        headers:{ "Accept" => "application/json", "Content-Type" => "application/json"},
+                        parameters:data
+    if response.code == 200
+
+      if async
+        return HODAsyncResponse.new(response,self)
+      end
+      return HODResponse.new(response)
+    else
+      puts response.body
+      #puts data[:json].encoding.name
+      raise HODError.new "Error #{response.body["error"]} -- #{response.body["reason"]}"
+    end
+
   end
 
   def post(handler, data=Hash.new, async=false)
