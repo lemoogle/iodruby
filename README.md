@@ -1,16 +1,37 @@
-# Iodruby
+**Note:** use `iod` branch for older compatibility syntax.  
 
-Ruby Gem to help call IDOL OnDemand API.
- [http://idolondemand.com](http://idolondemand.com)
+# Ruby gem for Haven OnDemand
+Official Ruby gem to help with calling Haven OnDemand APIs [http://havenondemand.com](http://havenondemand.com). Gem is hosted on rubygems.org [here](https://rubygems.org/gems/havenondemand).
+
+## What is Haven OnDemand?
+Haven OnDemand is a set of over 70 APIs for handling all sorts of unstructured data. Here are just some of our APIs' capabilities:
+* Speech to text
+* OCR
+* Text extraction
+* Indexing documents
+* Smart search
+* Language identification
+* Concept extraction
+* Sentiment analysis
+* Web crawlers
+* Machine learning
+
+For a full list of all the APIs and to try them out, check out https://www.havenondemand.com/developer/apis
 
 
 ## Installation
 
-To install from this git repo use the specific_install gem.
+To install from rubygems.org.
+
+```
+gem install havenondemand
+```
+
+To install the latest version from this github repo, use the specific_install gem.
 
 ```
 gem install specific_install
-gem specific_install http://github.com/lemoogle/iodruby
+gem specific_install https://github.com/HP-Haven-OnDemand/havenondemand-ruby
 ```
 
 
@@ -18,150 +39,182 @@ gem specific_install http://github.com/lemoogle/iodruby
 
 
 ### Importing
-
+When using rails and other frameworks with a gem file, include it in it.
+```ruby
+gem "havenondemand"
 ```
-require "iodruby"
+Or, require it directly in your app.
+```ruby
+require "havenondemand"
 ```
 
 ###Initializing the client
-
+```ruby
+client = HODClient.new(apikey, version)
 ```
-client= IODClient.new("http://api.idolondemand.com",$apikey)
+You can find your API key [here](https://www.haveondemand.com/account/api-keys.html) after signing up.
+
+`version` is an optional parameter (defaults to `'v1'`) and can be either `'v1'` or `'v2'`.
+
+## Sending requests to the API - POST and GET
+You can send requests to the API with either a POST or GET request, where POST requests are required for uploading files and recommended for larger size queries and GET requests are recommended for smaller size queries.
+
+### POST request
+```ruby
+client.get_request(hodApp, params, async, method(:callback))
 ```
+* `hodApp` is the name of the API you are calling (see this [list]() for available endpoints and our [documentation](https://dev.havenondemand.com/apis) for descriptions of each of the APIs)
+* `params` is a dictionary of parameters passed to the API
+* `async` specifies if you are calling the API asynchronously or synchronously, which is either `true` or `false`, respectively
+* `callback` which is a callback function which is executed when the response from the API is received. Specify 'nil' for returning response.
 
-All that is needed to initialize the client is an apikey and the url of the API.
+### GET request
+```ruby
+client.get_request(hodApp, params, async, method(:callback))
+```
+* `hodApp` is the name of the API you are calling (see this [list]() for available endpoints and our [documentation](https://dev.havenondemand.com/apis) for descriptions of each of the APIs)
+* `params` is a dictionary of parameters passed to the API
+* `async` specifies if you are calling the API asynchronously or synchronously, which is either `true` or `false`, respectively
+* `callback` which is a callback function which is executed when the response from the API is received. Specify 'nil' for returning response.
+
+### POST request for combinations
+```ruby
+client.post_request_combination(hodApp, params, async, method(:callback))
+```
+* `hodApp` is the name of the combination API you are calling
+* `params` is a dictionary of parameters passed to the API
+* `async` specifies if you are calling the API asynchronously or synchronously, which is either `true` or `false`, respectively
+* `callback` which is a callback function which is executed when the response from the API is received. Specify 'nil' for returning response.
 
 
-###Sending requests
+### GET request for combinations
+```ruby
+client.get_request_combination(hodApp, params, async, method(:callback))
+```
+* `hodApp` is the name of the combination API you are calling
+* `params` is a dictionary of parameters passed to the API
+* `async` specifies if you are calling the API asynchronously or synchronously, which is either `true` or `false`, respectively
+* `callback` which is a callback function which is executed when the response from the API is received. Specify 'nil' for returning response.
+
+## Synchronous vs Asynchronous
+Haven OnDemand's API can be called either synchronously or asynchronously. Users are encouraged to call asynchronously if they are POSTing large files that may require a lot of time to process. If not, calling them synchronously should suffice. For more information on the two, see [here](https://dev.havenondemand.com/docs/AsynchronousAPI.htm).
+
+### Synchronous
+To make a synchronous GET request to our Sentiment Analysis API
 
 ```ruby
-r=client.post('analyzesentiment',{:text=>'I like cats'})
+params = {:text=> 'I love Haven OnDemand!'}
+hodApp = "analyzesentiment"
+response = client.get_request(hodApp, params, false, nil)
 ```
-The client's *post* method takes the apipath that you're sending your request to as well as an object containing the parameters you want to send to the api. You do not need to send your apikey each time as the client will handle that automatically
+where the response will be in the `response` variable.
 
-###Posting files
+### Asynchronous
+To make an asynchronous POST request to our Sentiment Analysis API
 
 ```ruby
-r=client.post('ocrdocument',{:file=>File.new("/path/to/file", 'rb')})
+params = {:text=> 'I love Haven OnDemand!'}
+hodApp = "analyzesentiment"
+response_async = post_request(hodApp, params, async=true, nil)
+jobID = response_async['jobID']
 ```
-Sending files is just as easy.
+which will return back the job ID of your call. Use the job ID to call the get_job_status() or get_job_result() to get the result.
+
+#### Getting the results of an asynchronous request - Status API and Result API
+
+##### Status API
+The Status API checks to see the status of your job request. If it is finished processing, it will return the result. If not, it will return you the status of the job.
 
 ```ruby
-r=client.post('ocrdocument',{:mode=>'photo',:file=>File.new("/path/to/file", 'rb')})
-r=client.post('ocrdocument',{:mode=>'photo',:file=>File.new("/path/to/file", 'rb')})
+client.get_job_status(jobID, method(:callback))
 ```
-Any extra parameters should be added in the same way as regular calls, or in the data parameter.
+* `jobID` is the job ID of request returned after performing an asynchronous request
+* `callback` which is a callback function which is executed when the response from the API is received. Specify 'nil' for returning response.
 
-###Parsing the output
+To get the status, or job result if the job is complete
+```ruby
+client.get_job_status(jobID, method(:callback))
+```
+
+##### Result API
+The Result API checks the result of your job request. If it is finished processing, it will return the result. If it not, the call the wait until the result is returned or until it times out. **It is recommended to use the Status API over the Result API to avoid time outs**
 
 ```ruby
-myjson=r.json()
+client.get_job_result(jobID, method(:callback))
+```
+* `jobID` is the job ID of request returned after performing an asynchronous request
+* `callback` which is a callback function which is executed when the response from the API is received. Specify 'nil' for returning response.
+
+To get the result
+```ruby
+response = client.get_job_result(jobID, nil)
 ```
 
-The object returned is a response object from the python [requests library](http://docs.python-requests.org/en/latest/) and can easily be turned to json.
+## Using a callback function
+Most methods allow optional callback functions which are executed when the response of the API is received.
 
 ```ruby
-docs=myjson["documents"]
-array.each {|doc| puts doc["title"] }
+def syncCallback(response)
+  response = $parser.parse_payload(response)
+  if response != nil
+    puts response
+  else
+    errors = $parser.get_last_errors()
+    errors.each { |error|
+      eCode = error["error"]
+      if eCode == ErrorCode::QUEUED
+        jobID = error["jobID"]
+        client.get_job_status(jobID, method(:syncCallback))
+      elsif eCode == ErrorCode::IN_PROGRESS
+        jobID = error["jobID"]
+        client.get_job_status(jobID, method(:syncCallback))
+      else
+        puts eCode
+        puts error["detail"]
+        puts error["reason"]
+      end
+    }
+  end
+end
+
+def asyncCallback(response)
+  jobID = $parser.parse_jobid(response)
+  client.get_job_status(jobID, method(:syncCallback))
+end
+
+params = {:text=> 'I love Haven OnDemand!'}
+hodApp = "analyzesentiment"
+client.post_request(hodApp, params, true, method(:asyncCallback))
 ```
 
-###Indexing
-
-**Creating an index**
+## POSTing files
+POSTing files is just as easy. Simply include the path to the file you're POSTing in the parameters
 
 ```ruby
-index=client.createIndex("mytestindex",flavor="explorer")
+params = {:file=> 'path/to/file.jpg'}
+hodApp = "ocrdocument"
+response = hodClient.post_request(hodApp, params, false, nil)
+puts response
 ```
 
-An Index object can easily be created
-
-**Fetching indexes/an index**
+## POSTing files with post_request_combination
+POSTing files to a combination API is slightly different from POSting files to a standalone API.
 
 ```ruby
-index = client.getIndex('myindex')
-```
-The getIndex call will return an iodindex Index object but will not check for existence.
-
-```ruby
-indexes = client.listIndexes()
-indexes.fetch('myindex',client.createIndex('myindex'))
+files = [{"file1_input_name"=>"file1name.xxx"},{"file2_input_name"=>"file2name.xxx"}]
+params = {}
+params[:file] = files
+hodApp = "name_of_combination_api"
+response = client.post_request_combination(hodApp, params, false, nil)
 ```
 
-Here we first check the list of our indexes and return a newly created index if the index does not already exist
-
-**Deleting an index**
-
-```ruby
-index.delete()
-client.deleteIndex('myindex')
-```
-An index can be deleted in two equivalent ways
-
-**Indexing documents**
-
-```ruby
-doc1=IODDoc.new({title:"title1",reference:"doc1",content:"my content 1"})
-doc2=IODDoc.new({title:"title2",reference:"doc2",content:"my content 2"})
-```
-Documents can be created as regular python objects
-
-```
-index.addDoc(doc1)
-index.addDocs([doc1,doc2])
-```
-
-They can be added directly one at a time or in a batch.
-
-```
-for doc in docs:
-  index.pushDoc(doc)
-index.commit()
-```
-
-An alternative to *addDocs* and easy way to keep batch documents is to use the pushDoc method, the index will keep in memory a list of the documents it needs to index.
-
-```
-if index.countDocs()>10:
-  index.commit()
-```
-
-It makes it easy to batch together groups of documents.
-
-####Indexing - Connectors
-
-```ruby
-client= IODClient.new("http://api.idolondemand.com",$apikey)
-conn=IODConnector.new("mytestconnector",client)
-conn.create(type="web",config={ "url" => "http://www.idolondemand.com" })
-conn.delete()
-```
-
-
-### Asynchronous request
-
-For each call the Async parameter can be set to true to send an asynchronous request.
-
-```ruby
-r=client.post('analyzesentiment',{:text=>'I like cats'},async=True)
-print r.json()
-
-# will return status of call, queued or finished
-puts r.status().json()
-# Will wait until result to return
-puts r.result().json()
-```
-
-Same thing for indexing.
-
-```ruby
-r=index.commit(async=True)
-```
-
-
+## License
+Licensed under the MIT License.
 
 ## Contributing
+We encourage you to contribute to this repo! Please send pull requests with modified and updated code.
 
-1. Fork it ( https://github.com/lemoogle/iodruby/fork )
+1. Fork it ( https://github.com/HPE-Haven-OnDemand/havenondemand-ruby/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
