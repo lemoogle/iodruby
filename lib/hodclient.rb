@@ -1,9 +1,5 @@
-
-
-#require_relative 'hodunirest.rb'
-require 'Unirest'
 require 'json'
-#require File.dirname(__FILE__) + '/lib/unirest.rb'
+require 'Unirest'
 
 class HODClient
   def initialize(apikey, version="v1")
