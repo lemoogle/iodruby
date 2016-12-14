@@ -201,7 +201,6 @@ puts response
 POSTing files to a combination API is slightly different from POSting files to a standalone API.
 
 ```ruby
-files = []
 files = [{"file1_input_name"=>"file1name.xxx"},{"file2_input_name"=>"file2name.xxx"}]
 params = {}
 params[:file] = files
